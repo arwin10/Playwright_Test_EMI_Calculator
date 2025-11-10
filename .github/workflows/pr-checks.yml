@@ -68,6 +68,8 @@ jobs:
 
       - name: Run sanity tests
         run: npm run test:sanity
+        env:
+          HEADLESS: 'true'
 
       - name: Comment PR with results
         if: always()
