@@ -75,7 +75,7 @@ jobs:
         run: npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
         env:
           ENV: prod
-          HEADLESS: true
+          HEADLESS: 'true'
 
       - name: Upload test results
         if: always()
@@ -203,6 +203,7 @@ jobs:
         run: npm run test:sanity
         env:
           ENV: prod
+          HEADLESS: 'true'
       
       - name: Upload sanity test results
         if: always()
@@ -245,6 +246,7 @@ jobs:
         run: npm run test:smoke
         env:
           ENV: prod
+          HEADLESS: 'true'
       
       - name: Upload smoke test results
         if: always()
@@ -288,6 +290,7 @@ jobs:
         run: npm run test:regression
         env:
           ENV: prod
+          HEADLESS: 'true'
       
       - name: Upload regression test results
         if: always()
@@ -330,6 +333,7 @@ jobs:
         run: npm run test:negative
         env:
           ENV: prod
+          HEADLESS: 'true'
       
       - name: Upload negative test results
         if: always()
