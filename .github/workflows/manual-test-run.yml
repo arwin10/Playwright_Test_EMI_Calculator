@@ -1,0 +1,149 @@
+name: Manual Test Execution
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        type: choice
+        options:
+          - sanity
+          - smoke
+          - regression
+          - negative
+          - all
+      browser:
+        description: 'Browser to use'
+        required: true
+        type: choice
+        options:
+          - chromium
+          - firefox
+          - webkit
+          - all
+      environment:
+        description: 'Environment to test'
+        required: false
+        default: 'prod'
+        type: choice
+        options:
+          - prod
+          - staging
+          - dev
+      headed:
+        description: 'Run in headed mode (slower)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  manual-test:
+    name: Manual Test - ${{ github.event.inputs.test_type }} on ${{ github.event.inputs.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: |
+          if [ "${{ github.event.inputs.browser }}" == "all" ]; then
+            npx playwright install --with-deps
+          else
+            npx playwright install --with-deps ${{ github.event.inputs.browser }}
+          fi
+
+      - name: Run Tests
+        run: |
+          HEADED_FLAG=""
+          if [ "${{ github.event.inputs.headed }}" == "true" ]; then
+            HEADED_FLAG="--headed"
+          fi
+          
+          PROJECT_FLAG=""
+          if [ "${{ github.event.inputs.browser }}" != "all" ]; then
+            PROJECT_FLAG="--project=${{ github.event.inputs.browser }}"
+          fi
+          
+          case "${{ github.event.inputs.test_type }}" in
+            sanity)
+              npm run test:sanity -- $PROJECT_FLAG $HEADED_FLAG
+              ;;
+            smoke)
+              npm run test:smoke -- $PROJECT_FLAG $HEADED_FLAG
+              ;;
+            regression)
+              npm run test:regression -- $PROJECT_FLAG $HEADED_FLAG
+              ;;
+            negative)
+              npm run test:negative -- $PROJECT_FLAG $HEADED_FLAG
+              ;;
+            all)
+              npx playwright test $PROJECT_FLAG $HEADED_FLAG
+              ;;
+          esac
+        env:
+          ENV: ${{ github.event.inputs.environment }}
+          HEADLESS: ${{ github.event.inputs.headed == 'false' }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-test-results-${{ github.run_number }}
+          path: |
+            test-results/
+            playwright-report/
+            allure-results/
+          retention-days: 30
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-test-failures-${{ github.run_number }}
+          path: |
+            test-results/**/*.png
+            test-results/**/*.webm
+            test-results/**/*.md
+          retention-days: 14
+
+      - name: Generate Allure Report
+        if: always()
+        run: |
+          npm install -g allure-commandline
+          if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
+            allure generate allure-results --clean -o allure-report
+          fi
+
+      - name: Upload Allure Report
+        if: always() && hashFiles('allure-report/') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-allure-report-${{ github.run_number }}
+          path: allure-report/
+          retention-days: 30
+
+      - name: Create Summary
+        if: always()
+        run: |
+          echo "# Manual Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Type:** ${{ github.event.inputs.test_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Browser:** ${{ github.event.inputs.browser }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Headed Mode:** ${{ github.event.inputs.headed }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View Artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY

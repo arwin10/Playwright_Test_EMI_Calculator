@@ -1,0 +1,342 @@
+name: Playwright E2E Tests CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Test suite to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - sanity
+          - smoke
+          - regression
+          - negative
+  schedule:
+    - cron: '0 2 * * *'  # Run at 2 AM UTC daily
+
+jobs:
+  # Lint and type check
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript compiler
+        run: npx tsc --noEmit
+
+  # Full test suite with sharding
+  test:
+    name: Run All Tests
+    needs: lint
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_suite == 'all' || github.event.inputs.test_suite == ''
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        env:
+          ENV: prod
+          HEADLESS: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-${{ matrix.shard }}
+          path: |
+            test-results/
+            playwright-report/
+            allure-results/
+          retention-days: 30
+
+      - name: Upload videos on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-videos-${{ matrix.shard }}
+          path: test-results/**/*.webm
+          retention-days: 7
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.shard }}
+          path: test-results/**/*.png
+          retention-days: 7
+
+  # Generate consolidated reports
+  report:
+    name: Generate Test Reports
+    needs: [sanity, smoke, regression, negative]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-results
+
+      - name: Install Allure
+        run: npm install -g allure-commandline
+
+      - name: Merge Allure results
+        run: |
+          mkdir -p allure-results
+          find all-results -type f -name '*.json' -path '*/allure-results/*' -exec cp {} allure-results/ \; 2>/dev/null || true
+
+      - name: Generate Allure report
+        if: hashFiles('allure-results/*.json') != ''
+        run: allure generate allure-results --clean -o allure-report
+
+      - name: Upload Allure report
+        if: hashFiles('allure-report/') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 30
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' && hashFiles('allure-report/') != ''
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          destination_dir: test-reports
+
+  # Notify on failure
+  notify:
+    name: Notify on Failure
+    needs: [sanity, smoke, regression, negative]
+    runs-on: ubuntu-latest
+    if: failure() && github.event_name != 'pull_request'
+    
+    steps:
+      - name: Send notification
+        run: |
+          echo "Tests failed! Check the workflow run for details."
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+  # Sanity tests - quick smoke check
+  sanity:
+    name: Sanity Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    if: |
+      always() && 
+      (github.event.inputs.test_suite == 'sanity' || 
+       github.event.inputs.test_suite == '' || 
+       github.event_name == 'pull_request')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      
+      - name: Run sanity tests
+        run: npm run test:sanity
+        env:
+          ENV: prod
+      
+      - name: Upload sanity test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sanity-test-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+  # Smoke tests - critical path
+  smoke:
+    name: Smoke Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    if: |
+      always() && 
+      (github.event.inputs.test_suite == 'smoke' || 
+       github.event.inputs.test_suite == '' ||
+       github.event_name == 'push')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      
+      - name: Run smoke tests
+        run: npm run test:smoke
+        env:
+          ENV: prod
+      
+      - name: Upload smoke test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: |
+            test-results/
+            playwright-report/
+            allure-results/
+          retention-days: 14
+
+  # Regression tests - full suite
+  regression:
+    name: Regression Tests
+    needs: [sanity, smoke]
+    runs-on: ubuntu-latest
+    if: |
+      always() && 
+      (github.event.inputs.test_suite == 'regression' || 
+       github.event_name == 'push' || 
+       github.event_name == 'schedule')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      
+      - name: Run regression tests
+        run: npm run test:regression
+        env:
+          ENV: prod
+      
+      - name: Upload regression test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-results
+          path: |
+            test-results/
+            playwright-report/
+            allure-results/
+          retention-days: 30
+
+  # Negative tests - error scenarios
+  negative:
+    name: Negative Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    if: |
+      always() && 
+      (github.event.inputs.test_suite == 'negative' || 
+       github.event.inputs.test_suite == '')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      
+      - name: Run negative tests
+        run: npm run test:negative
+        env:
+          ENV: prod
+      
+      - name: Upload negative test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: negative-test-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
