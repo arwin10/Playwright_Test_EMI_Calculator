@@ -50,6 +50,7 @@ jobs:
         env:
           ENV: prod
           BROWSER: ${{ matrix.browser }}
+          HEADLESS: 'true'
 
       - name: Upload test results
         if: always()
@@ -96,6 +97,8 @@ jobs:
 
       - name: Run performance tests
         run: npx playwright test tests/smoke/performance.smoke.spec.ts
+        env:
+          HEADLESS: 'true'
 
       - name: Upload performance results
         if: always()
