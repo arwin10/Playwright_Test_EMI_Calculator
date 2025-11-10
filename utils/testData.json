@@ -1,0 +1,191 @@
+{
+  "validTestCases": [
+    {
+      "name": "Standard Home Loan",
+      "principal": 5000000,
+      "rate": 8.5,
+      "tenure": 240,
+      "loanType": "home"
+    },
+    {
+      "name": "Car Loan",
+      "principal": 800000,
+      "rate": 9.5,
+      "tenure": 60,
+      "loanType": "car"
+    },
+    {
+      "name": "Personal Loan",
+      "principal": 200000,
+      "rate": 12.5,
+      "tenure": 36,
+      "loanType": "personal"
+    },
+    {
+      "name": "Short Term Loan",
+      "principal": 100000,
+      "rate": 10.0,
+      "tenure": 12,
+      "loanType": "home"
+    },
+    {
+      "name": "Long Term Loan",
+      "principal": 10000000,
+      "rate": 7.5,
+      "tenure": 360,
+      "loanType": "home"
+    },
+    {
+      "name": "Mid Range Loan",
+      "principal": 2500000,
+      "rate": 8.75,
+      "tenure": 180,
+      "loanType": "home"
+    },
+    {
+      "name": "Low Interest Loan",
+      "principal": 1000000,
+      "rate": 6.5,
+      "tenure": 120,
+      "loanType": "home"
+    },
+    {
+      "name": "High Interest Loan",
+      "principal": 500000,
+      "rate": 15.0,
+      "tenure": 48,
+      "loanType": "personal"
+    },
+    {
+      "name": "Decimal Rate Test",
+      "principal": 3000000,
+      "rate": 8.25,
+      "tenure": 144,
+      "loanType": "home"
+    },
+    {
+      "name": "Minimum Tenure",
+      "principal": 50000,
+      "rate": 11.0,
+      "tenure": 6,
+      "loanType": "personal"
+    }
+  ],
+  "edgeCases": [
+    {
+      "name": "Minimum Principal",
+      "principal": 10000,
+      "rate": 10.0,
+      "tenure": 12
+    },
+    {
+      "name": "Maximum Principal",
+      "principal": 100000000,
+      "rate": 8.0,
+      "tenure": 360
+    },
+    {
+      "name": "Minimum Rate",
+      "principal": 1000000,
+      "rate": 0.1,
+      "tenure": 120
+    },
+    {
+      "name": "Maximum Rate",
+      "principal": 1000000,
+      "rate": 30.0,
+      "tenure": 60
+    },
+    {
+      "name": "Minimum Tenure",
+      "principal": 100000,
+      "rate": 10.0,
+      "tenure": 1
+    },
+    {
+      "name": "Maximum Tenure",
+      "principal": 5000000,
+      "rate": 8.5,
+      "tenure": 360
+    }
+  ],
+  "negativeTestCases": [
+    {
+      "name": "Zero Principal",
+      "principal": 0,
+      "rate": 10.0,
+      "tenure": 12,
+      "expectedError": true
+    },
+    {
+      "name": "Negative Principal",
+      "principal": -100000,
+      "rate": 10.0,
+      "tenure": 12,
+      "expectedError": true
+    },
+    {
+      "name": "Zero Rate",
+      "principal": 100000,
+      "rate": 0,
+      "tenure": 12,
+      "expectedError": false
+    },
+    {
+      "name": "Negative Rate",
+      "principal": 100000,
+      "rate": -5.0,
+      "tenure": 12,
+      "expectedError": true
+    },
+    {
+      "name": "Zero Tenure",
+      "principal": 100000,
+      "rate": 10.0,
+      "tenure": 0,
+      "expectedError": true
+    },
+    {
+      "name": "Negative Tenure",
+      "principal": 100000,
+      "rate": 10.0,
+      "tenure": -12,
+      "expectedError": true
+    },
+    {
+      "name": "Invalid Principal String",
+      "principal": "abc",
+      "rate": 10.0,
+      "tenure": 12,
+      "expectedError": true
+    },
+    {
+      "name": "Invalid Rate String",
+      "principal": 100000,
+      "rate": "xyz",
+      "tenure": 12,
+      "expectedError": true
+    },
+    {
+      "name": "Special Characters in Principal",
+      "principal": "100@00",
+      "rate": 10.0,
+      "tenure": 12,
+      "expectedError": true
+    },
+    {
+      "name": "Overflow Principal",
+      "principal": 999999999999,
+      "rate": 10.0,
+      "tenure": 12,
+      "expectedError": true
+    }
+  ],
+  "performanceTestCases": [
+    {
+      "name": "Quick Calculation Test",
+      "iterations": 10,
+      "maxResponseTime": 2000
+    }
+  ]
+}

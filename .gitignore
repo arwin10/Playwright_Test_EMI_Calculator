@@ -1,0 +1,85 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+out/
+
+# Test reports and results
+reports/
+report/
+allure-results/
+allure-report/
+test-results/
+playwright-report/
+playwright/.cache/
+html-report/
+junit-results/
+coverage/
+
+# Test artifacts
+screenshots/
+videos/
+traces/
+downloads/
+*.trace.zip
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+tmp/
+temp/
+
+# Playwright specific
+playwright/.auth/
+.auth/
+
+# CI/CD artifacts (local)
+.github/artifacts/
+
+# Misc
+*.bak
+*.orig

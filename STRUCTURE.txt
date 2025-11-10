@@ -1,0 +1,232 @@
+================================================================================
+    📁 PLAYWRIGHT E2E TEST FRAMEWORK - PROJECT STRUCTURE
+================================================================================
+
+Test_EMI_Calculator_Playwright/
+│
+├── 📋 CONFIGURATION FILES
+│   ├── .env                           # Environment variables (active)
+│   ├── .env.example                   # Environment template
+│   ├── .eslintrc.json                 # ESLint configuration
+│   ├── .gitignore                     # Git ignore rules
+│   ├── .npmrc                         # NPM configuration
+│   ├── .prettierrc                    # Prettier code formatting
+│   ├── package.json                   # Dependencies and scripts
+│   ├── playwright.config.ts           # Playwright main config
+│   └── tsconfig.json                  # TypeScript configuration
+│
+├── 📚 DOCUMENTATION
+│   ├── CONTRIBUTING.md                # Contribution guidelines
+│   ├── INSTALL.txt                    # Installation instructions
+│   ├── PROJECT_SUMMARY.md             # Project overview
+│   ├── README.md                      # Main documentation
+│   ├── SETUP_GUIDE.md                 # Quick setup guide
+│   ├── STRUCTURE.txt                  # This file
+│   └── TEST_PLAN.md                   # Detailed test plan
+│
+├── 🔄 CI/CD PIPELINE
+│   └── .github/
+│       └── workflows/
+│           └── playwright-ci.yml      # GitHub Actions workflow
+│
+├── 🎭 FIXTURES (Test Setup)
+│   └── fixtures/
+│       ├── baseFixture.ts             # Base test fixtures
+│       └── testDataFixture.ts         # Test data fixtures
+│
+├── 🏛️ PAGE OBJECTS (POM)
+│   └── pages/
+│       ├── BasePage.ts                # Base page class
+│       └── HomePage.ts                # Home page object
+│
+├── 🔧 UTILITIES
+│   └── utils/
+│       ├── config.ts                  # Configuration manager
+│       ├── helpers.ts                 # Helper functions
+│       ├── logger.ts                  # Custom logger (Pino)
+│       ├── testData.json              # Test data sets
+│       └── validators.ts              # EMI validators
+│
+└── 🧪 TEST SUITES
+    └── tests/
+        │
+        ├── 🟢 SANITY (8 tests - 1-2 min)
+        │   └── sanity/
+        │       └── homePage.sanity.spec.ts
+        │           ├── TC-01: Homepage loads
+        │           ├── TC-02: Calculator form present
+        │           ├── TC-03: Header present
+        │           ├── TC-04: Footer present
+        │           ├── TC-05: Page title correct
+        │           ├── TC-06: Inputs accept values
+        │           ├── TC-07: Calculate button works
+        │           └── TC-08: Meta tags exist
+        │
+        ├── 🔵 SMOKE (15+ tests - 3-5 min)
+        │   └── smoke/
+        │       ├── emiCalculation.smoke.spec.ts
+        │       │   ├── TC-S01: Basic EMI calculation
+        │       │   ├── TC-S02: Home loan calculation
+        │       │   ├── TC-S03: Car loan calculation
+        │       │   ├── TC-S04: Personal loan calculation
+        │       │   ├── TC-S05: Total amount validation
+        │       │   ├── TC-S06: Interest validation
+        │       │   ├── TC-S07: Chart rendering
+        │       │   └── TC-S08: Table rendering
+        │       │
+        │       ├── responsive.smoke.spec.ts
+        │       │   ├── TC-R01: Desktop viewport (1920x1080)
+        │       │   ├── TC-R02: Tablet viewport (768x1024)
+        │       │   ├── TC-R03: Mobile viewport (375x812)
+        │       │   └── TC-R04: Large desktop (2560x1440)
+        │       │
+        │       └── performance.smoke.spec.ts
+        │           ├── TC-P01: Page load time < 3s
+        │           ├── TC-P02: Load metrics validation
+        │           ├── TC-P03: Calculation response time
+        │           └── TC-P04: Multiple rapid calculations
+        │
+        ├── 🟡 REGRESSION (25+ tests - 10-15 min)
+        │   └── regression/
+        │       ├── dataDrivern.regression.spec.ts
+        │       │   ├── TC-DD01: Multiple valid inputs (5 tests)
+        │       │   ├── TC-DD02: Edge case calculations (6 tests)
+        │       │   ├── TC-DD03: Decimal rate handling (3 tests)
+        │       │   ├── TC-DD04: Various tenures (9 tests)
+        │       │   ├── TC-DD05: Various principals (6 tests)
+        │       │   └── TC-DD06: Various rates (10 tests)
+        │       │
+        │       ├── dynamicUpdate.regression.spec.ts
+        │       │   ├── TC-DU01: Principal change updates
+        │       │   ├── TC-DU02: Rate change updates
+        │       │   ├── TC-DU03: Tenure change updates
+        │       │   ├── TC-DU04: Recalculation after clear
+        │       │   └── TC-DU05: Sequential calculations
+        │       │
+        │       ├── seo.regression.spec.ts
+        │       │   ├── TC-SEO01: Page title SEO friendly
+        │       │   ├── TC-SEO02: Meta description exists
+        │       │   ├── TC-SEO03: Meta keywords exist
+        │       │   ├── TC-SEO04: Viewport meta tag
+        │       │   ├── TC-SEO05: Canonical URL
+        │       │   ├── TC-SEO06: Open Graph tags
+        │       │   ├── TC-SEO07: Structured data
+        │       │   └── TC-SEO08: Heading hierarchy
+        │       │
+        │       └── navigation.regression.spec.ts
+        │           ├── TC-NAV01: Page reload preserves URL
+        │           ├── TC-NAV02: Back navigation works
+        │           ├── TC-NAV03: Reload during calculation
+        │           ├── TC-NAV04: Direct URL access
+        │           └── TC-NAV05: Forward navigation
+        │
+        └── 🔴 NEGATIVE (23 tests - 5-7 min)
+            └── negative/
+                ├── validation.negative.spec.ts
+                │   ├── TC-NEG01: Blank inputs
+                │   ├── TC-NEG02: Zero principal
+                │   ├── TC-NEG03: Negative principal
+                │   ├── TC-NEG04: Zero interest rate
+                │   ├── TC-NEG05: Negative interest rate
+                │   ├── TC-NEG06: Zero tenure
+                │   ├── TC-NEG07: Negative tenure
+                │   ├── TC-NEG08: Special characters
+                │   ├── TC-NEG09: Alphabetic characters
+                │   ├── TC-NEG10: Very large principal
+                │   ├── TC-NEG11: Very large rate
+                │   ├── TC-NEG12: Very large tenure
+                │   └── TC-NEG13: Decimal tenure
+                │
+                └── errorHandling.negative.spec.ts
+                    ├── TC-ERR01: JavaScript disabled
+                    ├── TC-ERR02: Page reload mid-calculation
+                    ├── TC-ERR03: Rapid multiple clicks
+                    ├── TC-ERR04: Clear mid-process
+                    ├── TC-ERR05: Browser back button
+                    ├── TC-ERR06: Network interruption
+                    ├── TC-ERR07: Slow network simulation
+                    ├── TC-ERR08: Multiple tab behavior
+                    ├── TC-ERR09: Copy-paste special chars
+                    └── TC-ERR10: Session timeout
+
+================================================================================
+
+📊 STATISTICS
+================================================================================
+
+Total Files Created:        35 files
+  - Configuration:          10 files
+  - Documentation:          7 files
+  - Source Code:            7 files
+  - Test Files:             10 files
+  - CI/CD:                  1 file
+
+Total Test Cases:           71+ tests
+  - Sanity:                 8 tests
+  - Smoke:                  15+ tests
+  - Regression:             25+ tests
+  - Negative:               23 tests
+
+Total Lines of Code:        ~5000+ lines
+  - TypeScript:             ~3500 lines
+  - Documentation:          ~1500 lines
+  - Configuration:          ~100 lines
+
+================================================================================
+
+🎯 KEY FEATURES
+================================================================================
+
+✅ Page Object Model (POM)
+✅ Custom Fixtures
+✅ Data-Driven Testing
+✅ EMI Calculation Validator
+✅ Custom Logger (Pino)
+✅ Helper Utilities
+✅ Multiple Reporters (Allure, HTML, JSON)
+✅ CI/CD Pipeline (GitHub Actions)
+✅ Cross-Browser Support
+✅ Responsive Testing
+✅ Performance Testing
+✅ SEO Testing
+✅ Error Handling
+✅ Environment Configuration
+
+================================================================================
+
+🚀 QUICK COMMANDS
+================================================================================
+
+Install:        npm install
+Setup Browsers: npx playwright install --with-deps
+Run Sanity:     npm run test:sanity
+Run Smoke:      npm run test:smoke
+Run All:        npm test
+View Report:    npm run report
+Allure Report:  npm run allure:serve
+
+================================================================================
+
+📈 EXECUTION TIME
+================================================================================
+
+Sanity Suite:       1-2 minutes
+Smoke Suite:        3-5 minutes
+Regression Suite:   10-15 minutes
+Negative Suite:     5-7 minutes
+-------------------------------------------
+FULL SUITE TOTAL:   20-30 minutes
+
+(With parallel execution using 4 workers)
+
+================================================================================
+
+✨ READY TO USE!
+================================================================================
+
+All files are in place and ready to use.
+Run: npm install && npx playwright install --with-deps
+
+Then start testing with: npm run test:sanity
+
+================================================================================

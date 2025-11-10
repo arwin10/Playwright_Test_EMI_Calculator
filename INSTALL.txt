@@ -1,0 +1,212 @@
+================================================================================
+    PLAYWRIGHT E2E TEST FRAMEWORK - INSTALLATION INSTRUCTIONS
+================================================================================
+
+📋 QUICK START (3 STEPS)
+================================================================================
+
+1. INSTALL DEPENDENCIES
+   Command: npm install
+   Time: 2-3 minutes
+   
+2. INSTALL BROWSERS
+   Command: npx playwright install --with-deps
+   Time: 3-5 minutes
+   
+3. RUN TESTS
+   Command: npm run test:sanity
+   Time: 1-2 minutes
+
+================================================================================
+
+📦 DETAILED INSTALLATION STEPS
+================================================================================
+
+STEP 1: VERIFY NODE.JS
+   Check version: node --version
+   Required: v18 or higher
+   Install from: https://nodejs.org
+
+STEP 2: NAVIGATE TO PROJECT
+   cd /Users/arwin10/Documents/Test_EMI_Calculator_Playwright
+
+STEP 3: INSTALL NPM PACKAGES
+   npm install
+   
+   This installs:
+   - @playwright/test (v1.40.0)
+   - typescript (v5.3.0)
+   - allure-playwright (v2.15.0)
+   - allure-commandline (v2.25.0)
+   - dotenv (v16.3.1)
+   - pino (v8.16.0)
+   - pino-pretty (v10.2.0)
+
+STEP 4: INSTALL PLAYWRIGHT BROWSERS
+   npx playwright install --with-deps
+   
+   This installs:
+   - Chromium
+   - Firefox
+   - WebKit (Safari)
+   - System dependencies
+
+STEP 5: VERIFY INSTALLATION
+   npx playwright --version
+   
+   Expected output: Version 1.40.0
+
+STEP 6: RUN YOUR FIRST TEST
+   npm run test:sanity
+   
+   Expected: 8 tests should run and pass
+
+================================================================================
+
+🎯 TEST COMMANDS
+================================================================================
+
+RUN ALL TESTS:
+   npm test
+
+RUN SPECIFIC SUITES:
+   npm run test:sanity       # 8 tests, 1-2 min
+   npm run test:smoke        # 15+ tests, 3-5 min
+   npm run test:regression   # 25+ tests, 10-15 min
+   npm run test:negative     # 23 tests, 5-7 min
+
+RUN WITH OPTIONS:
+   npm run test:headed       # Show browser
+   npm run test:debug        # Debug mode
+   npm run test:ui           # Interactive UI
+
+VIEW REPORTS:
+   npm run report            # HTML report
+   npm run allure:serve      # Allure report
+
+================================================================================
+
+🔧 CONFIGURATION
+================================================================================
+
+ENVIRONMENT SETUP:
+   1. Copy .env.example to .env (already done)
+   2. Edit .env to customize settings
+   3. Available settings:
+      - ENV (dev/staging/prod)
+      - BASE_URL
+      - HEADLESS (true/false)
+      - TIMEOUT
+      - WORKERS (parallel execution)
+
+BROWSER SELECTION:
+   npx playwright test --project=chromium
+   npx playwright test --project=firefox
+   npx playwright test --project=webkit
+   npx playwright test --project=mobile-chrome
+
+================================================================================
+
+📊 PROJECT STRUCTURE
+================================================================================
+
+tests/sanity/     - Quick validation tests (8 tests)
+tests/smoke/      - Critical path tests (15+ tests)
+tests/regression/ - Full feature coverage (25+ tests)
+tests/negative/   - Error handling tests (23 tests)
+pages/            - Page Object Model classes
+utils/            - Utilities (logger, helpers, validators)
+fixtures/         - Test fixtures and setup
+reports/          - Generated test reports
+
+================================================================================
+
+🐛 TROUBLESHOOTING
+================================================================================
+
+ISSUE: npm install fails
+FIX: Delete node_modules and package-lock.json, run npm install again
+
+ISSUE: Browsers not installed
+FIX: Run: npx playwright install --with-deps
+
+ISSUE: Tests timeout
+FIX: Increase timeout in .env file (TIMEOUT=60000)
+
+ISSUE: Port conflict
+FIX: Check if port 3000 is available
+
+ISSUE: Permission denied
+FIX: Run with sudo (macOS/Linux) or as Administrator (Windows)
+
+ISSUE: Module not found
+FIX: Ensure you're in the correct directory and ran npm install
+
+================================================================================
+
+📚 DOCUMENTATION
+================================================================================
+
+README.md          - Complete framework documentation
+SETUP_GUIDE.md     - Quick setup and usage guide
+TEST_PLAN.md       - Detailed test plan and strategy
+CONTRIBUTING.md    - How to contribute to the project
+PROJECT_SUMMARY.md - Complete project overview
+
+================================================================================
+
+✅ VERIFICATION CHECKLIST
+================================================================================
+
+[ ] Node.js installed (v18+)
+[ ] Project directory accessed
+[ ] npm install completed
+[ ] Playwright browsers installed
+[ ] .env file configured
+[ ] Sanity tests run successfully
+[ ] Reports generated
+[ ] Documentation reviewed
+
+================================================================================
+
+🎓 LEARNING RESOURCES
+================================================================================
+
+Playwright Docs: https://playwright.dev
+TypeScript Docs: https://www.typescriptlang.org
+Allure Docs: https://docs.qameta.io/allure/
+
+================================================================================
+
+💡 TIPS
+================================================================================
+
+1. Start with sanity tests to verify setup
+2. Use test:ui mode for interactive debugging
+3. Check HTML reports after test execution
+4. Review test logs for failures
+5. Use --headed flag to see browser actions
+6. Customize .env for your environment
+
+================================================================================
+
+🚀 READY TO TEST!
+================================================================================
+
+Quick Start Command:
+   npm install && npx playwright install --with-deps && npm run test:sanity
+
+Expected Result:
+   ✅ 8 tests pass
+   ✅ Reports generated
+   ✅ Framework ready to use
+
+================================================================================
+
+Need Help?
+- Check README.md for detailed documentation
+- Review SETUP_GUIDE.md for step-by-step instructions
+- See TROUBLESHOOTING section above
+
+HAPPY TESTING! 🎭
+================================================================================
